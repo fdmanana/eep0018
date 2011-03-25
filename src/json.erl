@@ -44,7 +44,7 @@ do_encode(I) when is_integer(I) ->
 do_encode(F) when is_float(F) ->
     encode_double(F);
 do_encode(S) when is_binary(S); is_atom(S) ->
-    encode_string(S);
+    do_encode_string(S);
 do_encode({Props}) when is_list(Props) ->
     encode_proplist(Props);
 do_encode(Array) when is_list(Array) ->
@@ -65,12 +65,20 @@ encode_proplist([]) ->
     <<"{}">>;
 encode_proplist(Props) ->
     F = fun ({K, V}, Acc) ->
-                KS = encode_string(K),
+                KS = do_encode_string(K),
                 VS = do_encode(V),
                 [$,, VS, $:, KS | Acc]
         end,
     [$, | Acc1] = lists:foldl(F, "{", Props),
     lists:reverse([$\} | Acc1]).
+
+do_encode_string(S) ->
+    case encode_string(S) of
+    {error, Error} ->
+        exit({encode, {string_encode_failure, Error, S}});
+    String ->
+        <<$", String/binary, $">>
+    end.
 
 
 encode_string(_) ->
