@@ -18,10 +18,20 @@ error_mesg(J) ->
 
 check_good({J, E}) ->
     etap:is(json:decode(J), {ok, E}, ok_dec(J, E)),
-    etap:is(json:encode(E), {ok, J}, ok_enc(E, J));
+    case json:encode(E) of
+    {ok, IoList} ->
+        etap:is(iolist_to_binary(IoList), J, ok_enc(E, J));
+    Error ->
+        etap:is(Error, {ok, J}, ok_enc(E, J))
+    end;
 check_good({J, E, J2}) ->
     etap:is(json:decode(J), {ok, E}, ok_dec(J, E)),
-    etap:is(json:encode(E), {ok, J2}, ok_enc(E, J2)).
+    case json:encode(E) of
+    {ok, IoList} ->
+        etap:is(iolist_to_binary(IoList), J2, ok_enc(E, J2));
+    Error ->
+        etap:is(Error, {ok, J2}, ok_enc(E, J2))
+    end.
 
 check_error(J) ->
     etap:fun_is(
