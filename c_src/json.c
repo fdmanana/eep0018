@@ -1,4 +1,4 @@
-#include "erl_nif.h"
+#include "erl_nif_compat.h"
 
 ERL_NIF_TERM encode_string(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
 ERL_NIF_TERM encode_double(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);

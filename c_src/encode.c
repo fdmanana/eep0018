@@ -2,7 +2,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "erl_nif.h"
 #include "erl_nif_compat.h"
 #include "yajl/yajl_encode.h"
 

@@ -7,6 +7,11 @@ extern "C" {
 
 #include "erl_nif.h"
 
+#if ERL_NIF_MAJOR_VERSION == 0 && ERL_NIF_MINOR_VERSION == 1
+#error OTP R13B03 is not supported
+#endif
+
+
 #if ERL_NIF_MAJOR_VERSION == 1 && ERL_NIF_MINOR_VERSION == 0
 
 #define enif_open_resource_type_compat enif_open_resource_type
@@ -19,7 +24,7 @@ extern "C" {
 
 #endif /* R13B04 */
 
-#if ERL_NIF_MAJOR_VERSION == 2 && ERL_NIF_MINOR_VERSION == 0
+/* OTP R14 and future releases */
 
 #define enif_open_resource_type_compat(E, N, D, F, T) \
     enif_open_resource_type(E, NULL, N, D, F, T)
@@ -42,7 +47,6 @@ extern "C" {
 #define enif_get_atom_compat(E, T, B, S) \
     enif_get_atom(E, T, B, S, ERL_NIF_LATIN1)
 
-#endif /* R14 */
 
 
 
