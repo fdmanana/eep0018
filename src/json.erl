@@ -20,7 +20,7 @@ decode(IoList) ->
     case reverse_tokens(IoList) of
     {ok, ReverseTokens} ->
         [[EJson]] = make_ejson(ReverseTokens, [[]]),
-        EJson;
+        {ok, EJson};
     Error ->
         Error
     end.
