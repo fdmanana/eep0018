@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "erl_nif.h"
 #include "erl_nif_compat.h"
 #include "yajl/yajl_parse.h"
 #include "yajl/yajl_parser.h"
@@ -72,7 +71,7 @@ make_error(yajl_handle handle, ErlNifEnv* env)
     return enif_make_tuple(env, 2,
         enif_make_atom(env, "error"),
         enif_make_tuple(env, 2,
-            enif_make_uint(env, handle->bytesConsumed),
+            enif_make_uint_compat(env, handle->bytesConsumed),
             atom
         )
     );
@@ -249,8 +248,14 @@ check_rest(unsigned char* data, unsigned int size, unsigned int used)
 }
 
 ERL_NIF_TERM
+#ifdef OTP_R13B03
+reverse_tokens(ErlNifEnv* env, ERL_NIF_TERM ioList)
+{
+#else
 reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
+    ERL_NIF_TERM ioList = argv[0];
+#endif
     decode_ctx ctx;
     yajl_parser_config conf = {0, 1}; // No comments, check utf8
     yajl_handle handle = yajl_alloc(&decoder_callbacks, &conf, NULL, &ctx);
@@ -260,13 +265,22 @@ reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     ERL_NIF_TERM ret;
     
     ctx.env = env;
-    ctx.head = enif_make_list_from_array(env, NULL, 0);
+    // ctx.head = enif_make_list_from_array(env, NULL, 0);
+    ctx.head = enif_make_list(env, 0);
     
-    if(!enif_inspect_iolist_as_binary(env, argv[0], &bin))
+#ifdef OTP_R13B03
+    if(!enif_inspect_binary(env, ioList, &bin))
     {
         ret = enif_make_badarg(env);
         goto done;
     }
+#else
+    if(!enif_inspect_iolist_as_binary_compat(env, ioList, &bin))
+    {
+        ret = enif_make_badarg(env);
+        goto done;
+    }
+#endif
 
     status = yajl_parse(handle, bin.data, bin.size);
     used = handle->bytesConsumed;

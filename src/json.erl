@@ -2,6 +2,15 @@
 -export([encode/1, decode/1, fuzz/0, fuzz/1]).
 -on_load(init/0).
 
+-define(make_iolist(I), case erlang:system_info(otp_release) of
+    "R13B03" -> iolist_to_binary(I);
+    _ -> I
+    end).
+-define(enc_double(D), case erlang:system_info(otp_release) of
+    "R13B03" -> float_to_list(D);
+    _ -> encode_double(D)
+    end).
+
 init() ->
     SoName = case code:priv_dir(json) of
         {error, bad_name} ->
@@ -17,7 +26,7 @@ init() ->
     erlang:load_nif(SoName, 0).
 
 decode(IoList) ->
-    case reverse_tokens(IoList) of
+    case reverse_tokens(?make_iolist(IoList)) of
     {ok, ReverseTokens} ->
         [[EJson]] = make_ejson(ReverseTokens, [[]]),
         {ok, EJson};
@@ -42,7 +51,7 @@ do_encode(null) ->
 do_encode(I) when is_integer(I) ->
     integer_to_list(I);
 do_encode(F) when is_float(F) ->
-    encode_double(F);
+    ?enc_double(F);
 do_encode(S) when is_binary(S); is_atom(S) ->
     do_encode_string(S);
 do_encode({Props}) when is_list(Props) ->
