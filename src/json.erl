@@ -25,32 +25,38 @@ decode(IoList) ->
         Error
     end.
 
+encode(EJson) ->
+    try
+        {ok, do_encode(EJson)}
+    catch exit:{encode, Error} ->
+        {error, Error}
+    end.
 
 
-encode(true) ->
+do_encode(true) ->
     <<"true">>;
-encode(false) ->
+do_encode(false) ->
     <<"false">>;
-encode(null) ->
+do_encode(null) ->
     <<"null">>;
-encode(I) when is_integer(I) ->
+do_encode(I) when is_integer(I) ->
     integer_to_list(I);
-encode(F) when is_float(F) ->
+do_encode(F) when is_float(F) ->
     encode_double(F);
-encode(S) when is_binary(S); is_atom(S) ->
+do_encode(S) when is_binary(S); is_atom(S) ->
     encode_string(S);
-encode({Props}) when is_list(Props) ->
+do_encode({Props}) when is_list(Props) ->
     encode_proplist(Props);
-encode(Array) when is_list(Array) ->
+do_encode(Array) when is_list(Array) ->
     encode_array(Array);
-encode(Bad) ->
+do_encode(Bad) ->
     exit({encode, {bad_term, Bad}}).
 
 encode_array([]) ->
     <<"[]">>;
 encode_array(L) ->
     F = fun (O, Acc) ->
-                [$,, encode(O) | Acc]
+                [$,, do_encode(O) | Acc]
         end,
     [$, | Acc1] = lists:foldl(F, "[", L),
     lists:reverse([$\] | Acc1]).
@@ -60,7 +66,7 @@ encode_proplist([]) ->
 encode_proplist(Props) ->
     F = fun ({K, V}, Acc) ->
                 KS = encode_string(K),
-                VS = encode(V),
+                VS = do_encode(V),
                 [$,, VS, $:, KS | Acc]
         end,
     [$, | Acc1] = lists:foldl(F, "{", Props),
