@@ -93,7 +93,7 @@ encode_double(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
             enif_make_atom(env, "invalid_number")
         );
     } else {
-        snprintf(buffer, sizeof(buffer), "%g", number);
+        snprintf(buffer, sizeof(buffer), "%.16g", number);
         ret = enif_make_string(env, buffer, ERL_NIF_LATIN1);
     }
 done:
