@@ -32,7 +32,7 @@ encode_string(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
                               enif_make_atom(env, "insufficient_memory"));
         goto done;
     } else {
-        if (!enif_alloc_binary(yajl_buf_len(buf), &retBin)) {
+        if (!enif_alloc_binary_compat(env, yajl_buf_len(buf), &retBin)) {
             ret = enif_make_tuple(env, 2,
                                   enif_make_atom(env, "error"),
                                   enif_make_atom(env, "insufficient_memory"));
