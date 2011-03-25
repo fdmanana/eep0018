@@ -89,12 +89,12 @@ make_ejson([2 | RevEvs], [ObjValues, PrevValues | RestStack]) ->
 make_ejson([3 | RevEvs], Stack) ->
     % 3 ObjectEnd
     make_ejson(RevEvs, [[] | Stack]);
+make_ejson([{0, Value} | RevEvs], [Vals | RestStack] = _Stack) ->
+    % {0 , IntegerString}
+    make_ejson(RevEvs, [[to_int(Value) | Vals] | RestStack]);
 make_ejson([{1, Value} | RevEvs], [Vals | RestStack] = _Stack) ->
-    % {1 , IntegerString}
-    make_ejson(RevEvs, [[list_to_integer(Value) | Vals] | RestStack]);
-make_ejson([{2, Value} | RevEvs], [Vals | RestStack] = _Stack) ->
-    % {2, FloatString}
-    make_ejson(RevEvs, [[list_to_float(Value) | Vals] | RestStack]);
+    % {1, FloatString}
+    make_ejson(RevEvs, [[to_float(Value) | Vals] | RestStack]);
 make_ejson([{3, String} | RevEvs], [[PrevValue|RestObject] | RestStack] = _Stack) ->
     % {3 , ObjectKey}
     make_ejson(RevEvs, [[{String, PrevValue}|RestObject] | RestStack]);
@@ -111,3 +111,13 @@ not_loaded(Line) ->
     
 reverse_tokens(_) ->
     not_loaded(?LINE).
+
+to_int(B) when is_binary(B) ->
+    to_int(binary_to_list(B));
+to_int(L) ->
+    list_to_integer(L).
+
+to_float(B) when is_binary(B) ->
+    to_float(binary_to_list(B));
+to_float(L) ->
+    list_to_float(L).
