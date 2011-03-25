@@ -275,7 +275,7 @@ reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
         goto done;
     }
 #else
-    if(!enif_inspect_iolist_as_binary_compat(env, ioList, &bin))
+    if(!enif_inspect_iolist_as_binary(env, ioList, &bin))
     {
         ret = enif_make_badarg(env);
         goto done;

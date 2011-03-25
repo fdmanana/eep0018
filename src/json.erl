@@ -6,10 +6,6 @@
     "R13B03" -> iolist_to_binary(I);
     _ -> I
     end).
--define(enc_double(D), case erlang:system_info(otp_release) of
-    "R13B03" -> float_to_list(D);
-    _ -> encode_double(D)
-    end).
 
 init() ->
     SoName = case code:priv_dir(json) of
@@ -51,7 +47,7 @@ do_encode(null) ->
 do_encode(I) when is_integer(I) ->
     integer_to_list(I);
 do_encode(F) when is_float(F) ->
-    ?enc_double(F);
+    encode_double(F);
 do_encode(S) when is_binary(S); is_atom(S) ->
     do_encode_string(S);
 do_encode({Props}) when is_list(Props) ->
@@ -94,8 +90,8 @@ encode_string(_) ->
     not_loaded(?LINE).
 
 
-encode_double(_) ->
-    not_loaded(?LINE).
+encode_double(D) ->
+    float_to_list(D).
 
 
 make_ejson([], Stack) ->
