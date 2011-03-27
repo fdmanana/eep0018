@@ -91,10 +91,10 @@ make_ejson([3 | RevEvs], Stack) ->
     % 3 ObjectEnd
     make_ejson(RevEvs, [[] | Stack]);
 make_ejson([{0, Value} | RevEvs], [Vals | RestStack] = _Stack) ->
-    % {0 , IntegerString}
+    % {0, IntegerString}
     make_ejson(RevEvs, [[list_to_integer(binary_to_list(Value)) | Vals] | RestStack]);
 make_ejson([{1, Value} | RevEvs], [Vals | RestStack] = _Stack) ->
-    % {2, FloatString}
+    % {1, FloatString}
     make_ejson(RevEvs, [[list_to_float(binary_to_list(Value)) | Vals] | RestStack]);
 make_ejson([{3, String} | RevEvs], [[PrevValue|RestObject] | RestStack] = _Stack) ->
     % {3 , ObjectKey}
